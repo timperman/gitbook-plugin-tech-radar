@@ -1,5 +1,4 @@
 const d3 = require('d3');
-const Tabletop = require('tabletop');
 const _ = {
     map: require('lodash/map'),
     uniqBy: require('lodash/uniqBy'),
@@ -16,26 +15,16 @@ const GraphingRadar = require('../graphing/radar');
 const MalformedDataError = require('../exceptions/malformedDataError');
 const SheetNotFoundError = require('../exceptions/sheetNotFoundError');
 const ContentValidator = require('./contentValidator');
-const Sheet = require('./sheet');
 const ExceptionMessages = require('./exceptionMessages');
 
+var RadarData = require('radar.json');
 
-const GoogleSheet = function (sheetReference, sheetName) {
+const JsonToRadar = function (name) {
     var self = {};
 
     self.build = function () {
-        var sheet = new Sheet(sheetReference);
-        sheet.exists(function(notFound) {
-            if (notFound) {
-                displayErrorMessage(notFound);
-                return;
-            }
 
-            Tabletop.init({
-                key: sheet.id,
-                callback: createRadar
-            });
-        });
+        createRadar(RadarData);
 
         function displayErrorMessage(exception) {
             d3.selectAll(".loading").remove();
@@ -60,34 +49,36 @@ const GoogleSheet = function (sheetReference, sheetName) {
                 .html(message);
         }
 
-        function createRadar(__, tabletop) {
+        function createRadar(RadarData) {
 
             try {
 
-                if (!sheetName) {
-                    sheetName = tabletop.foundSheetNames[0];
-                }
-                var columnNames = tabletop.sheets(sheetName).columnNames;
+                name = RadarData.name;
 
-                var contentValidator = new ContentValidator(columnNames);
-                contentValidator.verifyContent();
-                contentValidator.verifyHeaders();
-
-                var all = tabletop.sheets(sheetName).all();
+                var all = RadarData.blips;
                 var blips = _.map(all, new InputSanitizer().sanitize);
 
-                document.title = tabletop.googleSheetName;
+                document.title = name;
                 d3.selectAll(".loading").remove();
 
                 var rings = _.map(_.uniqBy(blips, 'ring'), 'ring');
+
                 var ringMap = {};
                 var maxRings = 4;
+
+                console.log(rings);
+                console.log(RadarData.rings);
+
 
                 _.each(rings, function (ringName, i) {
                     if (i == maxRings) {
                         throw new MalformedDataError(ExceptionMessages.TOO_MANY_RINGS);
                     }
-                    ringMap[ringName] = new Ring(ringName, i);
+                    ringIndex = RadarData.rings[ringName]
+                    if (ringIndex === undefined) {
+                        throw new MalformedDataError(ExceptionMessages.RING_ORDER_MISMATCH);
+                    }
+                    ringMap[ringName] = new Ring(ringName, Number.parseInt(ringIndex));
                 });
 
                 var quadrants = {};
@@ -95,7 +86,7 @@ const GoogleSheet = function (sheetReference, sheetName) {
                     if (!quadrants[blip.quadrant]) {
                         quadrants[blip.quadrant] = new Quadrant(_.capitalize(blip.quadrant));
                     }
-                    quadrants[blip.quadrant].add(new Blip(blip.name, ringMap[blip.ring], blip.isNew.toLowerCase() === 'true', blip.topic, blip.description))
+                    quadrants[blip.quadrant].add(new Blip(blip.name, ringMap[blip.ring], blip.isNew.toLowerCase() === 'true', blip.topic, blip.description, blip.docLink))
                 });
 
                 var radar = new Radar();
@@ -151,34 +142,12 @@ var QueryParams = function (queryString) {
 };
 
 
-const GoogleSheetInput = function () {
+const JsonToRadarInput = function () {
     var self = {};
 
     self.build = function () {
-        var queryParams = QueryParams(window.location.search.substring(1));
-
-        if (queryParams.sheetId) {
-            var sheet = GoogleSheet(queryParams.sheetId, queryParams.sheetName);
-            sheet.init().build();
-        } else {
-            var content = d3.select('body')
-                .append('div')
-                .attr('class', 'input-sheet');
-
-            set_document_title();
-
-            plotLogo(content);
-
-            var bannerText = '<h1>Build your own radar</h1><p>Once you\'ve <a href ="https://info.thoughtworks.com/visualize-your-tech-strategy.html">created your Radar</a>, you can use this service' +
-                ' to generate an <br />interactive version of your Technology Radar. Not sure how? <a href ="https://info.thoughtworks.com/visualize-your-tech-strategy-guide.html">Read this first.</a></p>';
-
-            plotBanner(content, bannerText);
-
-            plotForm(content);
-
-            plotFooter(content);
-
-        }
+        var radar = JsonToRadar(RadarData.name);
+        radar.init().build();
     };
 
     return self;
@@ -189,25 +158,22 @@ function set_document_title() {
 }
 
 function plotLogo(content) {
-    content.append('div')
-        .attr('class', 'input-sheet__logo')
-        .html('<a href="https://www.thoughtworks.com"><img src="/images/tw-logo.png" / ></a>');
+    // content.append('div')
+    //     .attr('class', 'input-sheet__logo')
+    //     .html('<a href="https://www.thoughtworks.com"><img src="/images/tw-logo.png" / ></a>');
 }
 
 function plotFooter(content) {
-    content
-        .append('div')
-        .attr('id', 'footer')
-        .append('div')
-        .attr('class', 'footer-content')
-        .append('p')
-        .html('Powered by <a href="https://www.thoughtworks.com"> ThoughtWorks</a>. '
-        + 'By using this service you agree to <a href="https://info.thoughtworks.com/visualize-your-tech-strategy-terms-of-service.html">ThoughtWorks\' terms of use</a>. '
-        + 'You also agree to our <a href="https://www.thoughtworks.com/privacy-policy">privacy policy</a>, which describes how we will gather, use and protect any personal data contained in your public Google Sheet. '
-        + 'This software is <a href="https://github.com/thoughtworks/build-your-own-radar">open source</a> and available for download and self-hosting.');
-
-
-
+    // content
+    //     .append('div')
+    //     .attr('id', 'footer')
+    //     .append('div')
+    //     .attr('class', 'footer-content')
+    //     .append('p')
+    //     .html('Powered by <a href="https://www.thoughtworks.com"> ThoughtWorks</a>. '
+    //     + 'By using this service you agree to <a href="https://info.thoughtworks.com/visualize-your-tech-strategy-terms-of-service.html">ThoughtWorks\' terms of use</a>. '
+    //     + 'You also agree to our <a href="https://www.thoughtworks.com/privacy-policy">privacy policy</a>, which describes how we will gather, use and protect any personal data contained in your public Google Sheet. '
+    //     + 'This software is <a href="https://github.com/thoughtworks/build-your-own-radar">open source</a> and available for download and self-hosting.');
 }
 
 function plotBanner(content, text) {
@@ -217,27 +183,4 @@ function plotBanner(content, text) {
 
 }
 
-function plotForm(content) {
-    content.append('div')
-        .attr('class', 'input-sheet__form')
-        .append('p')
-        .html('<strong>Enter the URL of your <a href="https://info.thoughtworks.com/visualize-your-tech-strategy-guide.html#publish-byor-sheet" target="_blank">published</a> Google Sheet below…</strong>');
-
-    var form = content.select('.input-sheet__form').append('form')
-        .attr('method', 'get');
-
-    form.append('input')
-        .attr('type', 'text')
-        .attr('name', 'sheetId')
-        .attr('placeholder', 'e.g. https://docs.google.com/spreadsheets/d/1waDG0_W3-yNiAaUfxcZhTKvl7AUCgXwQw8mdPjCz86U/');
-
-    form.append('button')
-        .attr('type', 'submit')
-        .append('a')
-        .attr('class', 'button')
-        .text('Build my radar');
-
-    form.append('p').html("<a href='https://info.thoughtworks.com/visualize-your-tech-strategy-guide.html#faq'>Need help?</a>");
-}
-
-module.exports = GoogleSheetInput;
+module.exports = JsonToRadarInput;

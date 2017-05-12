@@ -3,80 +3,81 @@
 const webpack = require('webpack');
 const path = require('path');
 const buildPath = path.join(__dirname, './dist');
-const args = require('yargs').argv;
 
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-let isProd = args.prod;
-let isDev = args.dev;
-
 let entry = ['./src/site.js'];
-let devtool;
-
-if (isDev) {
-    entry.push('webpack-dev-server/client?http://0.0.0.0:8080');
-    devtool = 'source-map';
-}
 
 let plugins = [
     new ExtractTextPlugin('[name].[hash].css'),
-    new HtmlWebpackPlugin({
-        template: './src/index.html',
-        inject: 'body',
-        chunks: 'app'
-    })
+    new webpack.NoErrorsPlugin(),
+    new webpack.optimize.DedupePlugin(),
+    new webpack.optimize.UglifyJsPlugin({
+        compress: {
+            warnings: false
+        },
+        mangle: true
+    }),
+    new webpack.optimize.OccurenceOrderPlugin()
 ];
 
-if (isProd) {
-    plugins.push(
-        new webpack.NoErrorsPlugin(),
-        new webpack.optimize.DedupePlugin(),
-        new webpack.optimize.UglifyJsPlugin({
-            compress: {
-                warnings: false
-            },
-            mangle: true
-        }),
-        new webpack.optimize.OccurenceOrderPlugin()
-    );
-}
+module.exports = function(outputDir, publicPath, htmlFilename) {
+  plugins.push(new HtmlWebpackPlugin({
+    filename: htmlFilename ? htmlFilename : 'radar.html',
+    chunks: 'app'
+  }))
 
-module.exports = {
-    entry: entry,
+  return new Promise(function(resolve, reject) {
+    var compiler = webpack({
+      context: path.resolve('./node_modules/gitbook-plugin-tech-radar'),
 
-    node: {
-        fs: 'empty',
-        net: 'empty',
-        tls: 'empty'
-    },
+      entry: entry,
 
-    output: {
-        path: buildPath,
-        publicPath: '/',
-        filename: '[name].[hash].js'
-    },
+      node: {
+          fs: 'empty',
+          net: 'empty',
+          tls: 'empty'
+      },
 
-    module: {
-        loaders: [
-            { test: /\.json$/, loader: 'json'},
-            { test: /\.js$/, exclude: /node_modules/, loader: 'babel'},
-            { test: /\.scss$/, exclude: /node_modules/, loader: ExtractTextPlugin.extract('style', 'css?sourceMap!sass') },
-            { test: /\.(png|jpg|ico)$/, exclude: /node_modules/, loader: 'file-loader?name=images/[name].[ext]&context=./src/images' }
-        ]
-    },
+      output: {
+          path: outputDir ? outputDir : buildPath,
+          publicPath: publicPath ? publicPath : '/',
+          filename: '[name].[hash].js'
+      },
 
-    quiet: false,
-    noInfo: false,
+      resolve: {
+        fallback: outputDir
+      },
 
-    plugins: plugins,
+      module: {
+          loaders: [
+              { test: /\.json$/, loader: 'json'},
+              { test: /\.js$/, exclude: /node_modules/, loader: 'babel'},
+              { test: /\.scss$/, loader: ExtractTextPlugin.extract('style', 'css?sourceMap!sass') },
+              { test: /\.(png|jpg|ico)$/, loader: 'file-loader?name=images/[name].[ext]&context=./src/images' }
+          ]
+      },
 
-    devtool: devtool,
+      quiet: false,
+      noInfo: false,
 
-    devServer: {
-        contentBase: buildPath,
-        host: '0.0.0.0',
-        port: 8080
-    }
+      plugins: plugins
+    })
+
+    console.log("Compiling radar...")
+    compiler.run(function(err, stats) {
+      if ( err ) {
+        console.log(err)
+        reject(err)
+      } else {
+        if ( stats.hasErrors() ) {
+          stats.toJson().errors.forEach(function(e) {
+            console.log(e)
+          })
+        }
+        resolve(stats)
+      }
+    })
+  })
 };
-

@@ -225,9 +225,10 @@ const Radar = function (size, radar) {
 
           var blipItemDescription = blipListItem.append('div')
             .attr('class', 'blip-item-description');
-          if (blip.description()) {
-            blipItemDescription.append('p').html(blip.description());
-          }
+            if (blip.description() || blip.docLink()) {
+              var desc = blip.docLink() ? '<a href="' + blip.docLink() + '">Documentation</a><br/><br/>' : ''
+              blipItemDescription.append('p').html(desc + blip.description());
+            }
 
           var mouseOver = function () {
             d3.selectAll('g.blip-link').attr('opacity', 0.3);
