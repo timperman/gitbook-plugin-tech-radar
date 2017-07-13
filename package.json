@@ -1,6 +1,6 @@
 {
   "name": "gitbook-plugin-tech-radar",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Generate a (Thoughtworks) tech radar from pages in a Gitbook. Forked from https://github.com/thoughtworks/build-your-own-radar",
   "main": "index.js",
   "engines": {
@@ -25,7 +25,12 @@
       },
       "rings": {
         "type": "object",
-        "default": { "adopt": "0", "trial": "1", "assess": "2", "hold": "3" },
+        "default": {
+          "adopt": "0",
+          "trial": "1",
+          "assess": "2",
+          "hold": "3"
+        },
         "description": "{ \"name\": \"index\", ... } formatted map of radar rings"
       }
     }
@@ -39,22 +44,22 @@
   ],
   "license": "AGPL-3.0",
   "dependencies": {
-    "babel-core": "^6.14.0",
-    "babel-loader": "^6.2.5",
-    "chance": "^1.0.4",
-    "css-loader": "^0.25.0",
-    "d3": "^4.2.6",
-    "d3-tip": "^0.7.1",
-    "extract-text-webpack-plugin": "^1.0.1",
-    "file-loader": "^0.9.0",
-    "html-webpack-plugin": "^2.22.0",
-    "json-loader": "^0.5.4",
-    "lodash": "^4.16.2",
-    "node-sass": "^3.10.0",
-    "sanitize-html": "^1.13.0",
-    "sass-loader": "^4.0.2",
-    "style-loader": "^0.13.1",
-    "webpack": "^1.13.2",
-    "xmlhttprequest": "^1.8.0"
+    "babel-core": "6.14.0",
+    "babel-loader": "6.2.5",
+    "chance": "1.0.4",
+    "css-loader": "0.25.0",
+    "d3": "4.2.6",
+    "d3-tip": "0.7.1",
+    "extract-text-webpack-plugin": "1.0.1",
+    "file-loader": "0.9.0",
+    "html-webpack-plugin": "2.22.0",
+    "json-loader": "0.5.4",
+    "lodash": "4.16.2",
+    "node-sass": "3.10.0",
+    "sanitize-html": "1.13.0",
+    "sass-loader": "4.0.2",
+    "style-loader": "0.13.1",
+    "webpack": "1.13.2",
+    "xmlhttprequest": "1.8.0"
   }
 }
