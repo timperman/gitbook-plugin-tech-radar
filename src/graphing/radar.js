@@ -214,6 +214,7 @@ const Radar = function (size, radar) {
             .attr('x', x)
             .attr('y', y + 4)
             .attr('class', 'blip-text')
+            .attr('data-tags', blip.tags().join(' '))
             .attr('text-anchor', 'middle')
             .text(blip.number());
 
@@ -415,6 +416,21 @@ const Radar = function (size, radar) {
       .on('click', window.print.bind(window));
   }
 
+  function filterTags() {
+    console.log(d3.event.target.value);
+  }
+
+  function plotFilter(data, selectedElement) {
+    selectedElement.append('select')
+      .attr('class', 'radar-filter')
+      .on('change', filterTags)
+      .selectAll('option')
+        .data(data).enter()
+          .append('option')
+          .attr('value', function(d) { return d; })
+          .text(function(d) { return d; })
+  }
+
   function plotRadarFooter() {
     d3.select('body')
       .insert('div', '#radar-plot + *')
@@ -508,6 +524,9 @@ const Radar = function (size, radar) {
 
     plotQuadrantButtons(quadrants, header);
 
+    const tags = ['', 'test', 'ci'];
+    plotFilter(tags, header);
+
     radarElement.style('height', size + 14 + 'px');
     svg = radarElement.append("svg").call(tip);
     svg.attr('id', 'radar-plot').attr('width', size).attr('height', size + 14);
@@ -521,6 +540,10 @@ const Radar = function (size, radar) {
 
     plotRadarFooter();
   };
+
+  self.state = {
+    tags: radar.tags
+  }
 
   return self;
 };
