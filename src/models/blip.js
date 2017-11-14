@@ -1,4 +1,4 @@
-const Blip = function (name, ring, isNew, topic, description, docLink) {
+const Blip = function (name, ring, isNew, topic, description, docLink, tags) {
   var self, number;
 
   self = {};
@@ -15,6 +15,18 @@ const Blip = function (name, ring, isNew, topic, description, docLink) {
   self.description = function () {
     return description || '';
   };
+
+  self.tags = function() {
+    if (tags) {
+      return Object.values(tags)
+    }
+
+    return '';
+  }
+
+  self.hasTag = function(tag) {
+    return true;
+  }
 
   self.docLink = function () {
     return docLink || '';

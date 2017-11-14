@@ -227,7 +227,7 @@ const Radar = function (size, radar) {
             .attr('class', 'blip-item-description');
             if (blip.description() || blip.docLink()) {
               var desc = blip.docLink() ? '<a href="' + blip.docLink() + '">Documentation</a><br/><br/>' : ''
-              blipItemDescription.append('p').html(desc + blip.description());
+              blipItemDescription.append('p').html(desc + blip.description() + "Tags: " + blip.tags().join(', '));
             }
 
           var mouseOver = function () {

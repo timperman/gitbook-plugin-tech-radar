@@ -4,7 +4,8 @@ var webpackBuild = require('./webpack.config.js')
 var descRegExp = new RegExp(/<p>(.+?)<\/p>/)
 
 let radar = {
-  blips: []
+  blips: [],
+  tags: {}
 }
 
 module.exports = {
@@ -12,13 +13,27 @@ module.exports = {
       "page": function(page) {
         if ( page['tech-radar'] ) {
           var result = descRegExp.exec(page.content)
-          radar.blips.push({
+          const blip = {
             name: page.title,
-            description: ( result != null && result.length > 0 ) ? result[0] : '',
+            description: (result != null && result.length > 0) ? result[0] : '',
             ring: page['tech-radar'].ring,
             quadrant: page['tech-radar'].quadrant,
-            docLink: this.output.toURL(page.path)
-          })
+            docLink: this.output.toURL(page.path),
+            tags: page['tech-radar'].tags
+          };
+
+          radar.blips.push(blip)
+
+          if (blip.tags) {
+            radar.tags = blip.tags.reduce((allTags, tag) => {
+              if (!allTags[tag]) {
+                allTags[tag] = []
+              }
+              allTags[tag].push(blip.docLink)
+
+              return allTags
+            }, radar.tags)
+          }
         }
         return page
       },
@@ -27,6 +42,8 @@ module.exports = {
         var config = this.config.get('pluginsConfig.tech-radar', {});
         radar.name = config.title
         radar.rings = config.rings
+
+        console.log("Final radar", radar)
 
         var bookDir = this.output.resolve(".")
 

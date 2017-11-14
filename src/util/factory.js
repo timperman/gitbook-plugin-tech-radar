@@ -56,6 +56,8 @@ const JsonToRadar = function (name) {
                 name = RadarData.name;
 
                 var all = RadarData.blips;
+                var tags = RadarData.tags;
+                console.log("All the tags:", tags)
                 var blips = _.map(all, new InputSanitizer().sanitize);
 
                 document.title = name;
@@ -86,7 +88,8 @@ const JsonToRadar = function (name) {
                     if (!quadrants[blip.quadrant]) {
                         quadrants[blip.quadrant] = new Quadrant(_.capitalize(blip.quadrant));
                     }
-                    quadrants[blip.quadrant].add(new Blip(blip.name, ringMap[blip.ring], blip.isNew.toLowerCase() === 'true', blip.topic, blip.description, blip.docLink))
+                    console.log('blip tags at constructor', blip.name, blip.tags)
+                    quadrants[blip.quadrant].add(new Blip(blip.name, ringMap[blip.ring], blip.isNew.toLowerCase() === 'true', blip.topic, blip.description, blip.docLink, blip.tags))
                 });
 
                 var radar = new Radar();

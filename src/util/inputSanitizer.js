@@ -23,7 +23,12 @@ const InputSanitizer = function () {
     function trimWhiteSpaces(blip) {
       var processedBlip = {};
       _.forOwn(blip, function(value, key) {
-        processedBlip[key.trim()] = value.trim();
+        if (Array.isArray(value)) {
+          processedBlip[key.trim()] = trimWhiteSpaces(value);
+        } else {
+          processedBlip[key.trim()] = value.trim();
+        }
+
       });
       return processedBlip;
     }
@@ -36,6 +41,7 @@ const InputSanitizer = function () {
       blip.isNew = sanitizeHtml(blip.isNew, restrictedOptions);
       blip.ring = sanitizeHtml(blip.ring, restrictedOptions);
       blip.quadrant = sanitizeHtml(blip.quadrant, restrictedOptions);
+      // blip.tags = blip.tags.map((tag) => sanitizeHtml(tag, restrictedOptions));
 
       return blip;
     };
