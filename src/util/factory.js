@@ -88,7 +88,6 @@ const JsonToRadar = function (name) {
                     if (!quadrants[blip.quadrant]) {
                         quadrants[blip.quadrant] = new Quadrant(_.capitalize(blip.quadrant));
                     }
-                    console.log('blip tags at constructor', blip.name, blip.tags)
                     quadrants[blip.quadrant].add(new Blip(blip.name, ringMap[blip.ring], blip.isNew.toLowerCase() === 'true', blip.topic, blip.description, blip.docLink, blip.tags))
                 });
 

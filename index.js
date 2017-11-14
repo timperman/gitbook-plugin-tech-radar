@@ -43,8 +43,6 @@ module.exports = {
         radar.name = config.title
         radar.rings = config.rings
 
-        console.log("Final radar", radar)
-
         var bookDir = this.output.resolve(".")
 
         return this.output.writeFile("radar.json", JSON.stringify(radar)).then(function() {

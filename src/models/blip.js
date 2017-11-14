@@ -21,11 +21,18 @@ const Blip = function (name, ring, isNew, topic, description, docLink, tags) {
       return Object.values(tags)
     }
 
-    return '';
+    return [];
   }
 
   self.hasTag = function(tag) {
-    return true;
+    if (window.tag) {
+      if (tags) {
+        return Object.values(tags).includes(tag)
+      }
+      return false
+    }
+
+    return true
   }
 
   self.docLink = function () {
