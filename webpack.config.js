@@ -52,6 +52,7 @@ module.exports = function(outputDir, publicPath, htmlFilename) {
 
       module: {
           loaders: [
+	      { test: /\.css/, loader: ExtractTextPlugin.extract('style', 'css?sourceMap')},
               { test: /\.json$/, loader: 'json'},
               { test: /\.js$/, exclude: /node_modules/, loader: 'babel'},
               { test: /\.scss$/, loader: ExtractTextPlugin.extract('style', 'css?sourceMap!sass') },

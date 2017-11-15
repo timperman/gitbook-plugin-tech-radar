@@ -3,7 +3,8 @@ const d3tip = require('d3-tip');
 const d3cloud = require('d3-cloud');
 const Chance = require('chance');
 const _ = require('lodash/core');
-
+const SlimSelect = require('slim-select');
+const SlimSelectCSS = require('slim-select/dist/index.css');
 const RingCalculator = require('../util/ringCalculator');
 
 const Radar = function (size, radar) {
@@ -460,15 +461,22 @@ const Radar = function (size, radar) {
   }
 
   function plotFilter(data, selectedElement) {
-    selectedElement.append('select')
-      .attr('class', 'radar-filter')
-      .attr('multiple', 'true')
-      .on('change', filterTags)
-      .selectAll('option')
-        .data(data).enter()
-          .append('option')
-          .attr('value', function(d) { return d; })
-          .text(function(d) { return d; })
+    selectedElement.append('div')
+      .attr('class', 'radar-filter-container')
+      .append('select')
+	.attr('class', 'radar-filter')
+	.attr('multiple', 'true')
+	.on('change', filterTags)
+	.selectAll('option')
+	  .data(data).enter()
+	    .append('option')
+	    .attr('value', function(d) { return d; })
+	    .text(function(d) { return d; })
+
+    return new SlimSelect({
+      select: '.radar-filter',
+      placeholder: 'tags'
+    })
   }
 
   function plotRadarFooter() {
@@ -605,10 +613,9 @@ const Radar = function (size, radar) {
     rings = radar.rings();
     quadrants = radar.quadrants();
     var header = plotRadarHeader();
+    var tags = Object.keys(radar.tags());
 
     plotQuadrantButtons(quadrants, header);
-
-    const tags = ['', 'test', 'ci'];
     plotFilter(tags, header);
 
     radarElement.style('height', size + 14 + 'px');

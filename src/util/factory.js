@@ -57,7 +57,7 @@ const JsonToRadar = function (name) {
 
                 var all = RadarData.blips;
                 var tags = RadarData.tags;
-                console.log("All the tags:", tags)
+		// console.log("All the tags:", tags)
                 var blips = _.map(all, new InputSanitizer().sanitize);
 
                 document.title = name;
@@ -68,8 +68,8 @@ const JsonToRadar = function (name) {
                 var ringMap = {};
                 var maxRings = 4;
 
-                console.log(rings);
-                console.log(RadarData.rings);
+		// console.log(rings);
+		// console.log(RadarData.rings);
 
 
                 _.each(rings, function (ringName, i) {
@@ -95,6 +95,8 @@ const JsonToRadar = function (name) {
                 _.each(quadrants, function (quadrant) {
                     radar.addQuadrant(quadrant)
                 });
+
+		radar.setTags(tags);
 
                 var size = (window.innerHeight - 133) < 620 ? 620 : window.innerHeight - 133;
 
