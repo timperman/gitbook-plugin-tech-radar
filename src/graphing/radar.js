@@ -202,7 +202,9 @@ const Radar = function (size, radar) {
           var x = coordinates[0];
           var y = coordinates[1];
 
-          var group = quadrantGroup.append('g').attr('class', 'blip-link');
+          var group = quadrantGroup.append('g')
+            .attr('class', 'blip-link')
+            .attr('data-tags', blip.tags().join(' '))
 
           if (blip.isNew()) {
             triangle(x, y, order, group);
@@ -214,11 +216,13 @@ const Radar = function (size, radar) {
             .attr('x', x)
             .attr('y', y + 4)
             .attr('class', 'blip-text')
-            .attr('data-tags', blip.tags().join(' '))
             .attr('text-anchor', 'middle')
             .text(blip.number());
 
-          var blipListItem = ringList.append('li');
+          var blipListItem = ringList
+            .append('li')
+            .attr('class', 'blip-list-item-group')
+            .attr('data-tags', blip.tags().join(' '));
           var blipText = blip.number() + '. ' + blip.name() + (blip.topic() ? ('. - ' + blip.topic()) : '');
           blipListItem.append('div')
             .attr('class', 'blip-list-item')
@@ -417,12 +421,44 @@ const Radar = function (size, radar) {
   }
 
   function filterTags() {
-    console.log(d3.event.target.value);
+    const tags = Array.from(d3.event.target.options)
+      .reduce(function(acc, tag) {
+        tag.selected && acc.push(tag.value);
+        return acc;
+      }, [])
+
+    toggle(d3.selectAll('.blip-link'))
+    toggle(d3.selectAll('.blip-list-item-group'))
+
+    function toggle(selected) {
+      if (tags.length === 0 || tags[0] === '') {
+        selected.attr('style', '')
+
+      } else {
+        var hideSet = selected
+
+        tags.forEach(function(tag) {
+          const selector = '[data-tags~=' + tag + ']'
+
+          // show
+          selected
+            .filter(selector)
+            .attr('style', '')
+
+          // hide
+          hideSet = hideSet
+            .filter(':not('+ selector +')')
+        })
+
+        hideSet.attr('style', 'display:none')
+      }
+    }
   }
 
   function plotFilter(data, selectedElement) {
     selectedElement.append('select')
       .attr('class', 'radar-filter')
+      .attr('multiple', 'true')
       .on('change', filterTags)
       .selectAll('option')
         .data(data).enter()
