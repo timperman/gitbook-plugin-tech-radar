@@ -8,6 +8,17 @@ let radar = {
   tags: {}
 }
 
+function isBlipNew(page) {
+  const ring = page['tech-radar'].ring
+  const prevRing = page['tech-radar'].previousRing || ''
+
+  if (ring === prevRing) {
+    return "false"
+  }
+
+  return "true"
+}
+
 module.exports = {
     hooks: {
       "page": function(page) {
@@ -19,6 +30,7 @@ module.exports = {
             ring: page['tech-radar'].ring,
             quadrant: page['tech-radar'].quadrant,
             docLink: this.output.toURL(page.path),
+            isNew: isBlipNew(page),
             tags: page['tech-radar'].tags
           };
 
