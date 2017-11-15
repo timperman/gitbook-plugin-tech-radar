@@ -501,44 +501,53 @@ const Radar = function (size, radar) {
     d3.selectAll('.quadrant-group:not(.quadrant-group-' + order + ')').style('opacity', 1);
   }
 
-  var cloudFill = d3.scaleOrdinal(d3.schemeCategory10);
-
-  var cloudLayout = d3cloud()
-    .size([500, 500])
-    .words([
-      "Hello", "world", "normally", "you", "want", "more", "words",
-      "than", "this"].map(function (d) {
-        return { text: d, size: 10 + Math.random() * 90, test: "haha" };
-      }))
-    .padding(5)
-    .rotate(function () { return ~~(Math.random() * 2) * 90; })
-    .font("Impact")
-    .fontSize(function (d) { return d.size; })
-    .on("end", cloudDraw);
-
-  function cloudDraw(words) {
-    d3.select("#tagcloud").append("svg")
-      .attr("width", cloudLayout.size()[0])
-      .attr("height", cloudLayout.size()[1])
-      .append("g")
-      .attr("transform", "translate(" + cloudLayout.size()[0] / 2 + "," + cloudLayout.size()[1] / 2 + ")")
-      .selectAll("text")
-      .data(words)
-      .enter().append("text")
-      .style("font-size", function (d) { return d.size + "px"; })
-      .style("font-family", "Impact")
-      .style("fill", function (d, i) { return cloudFill(i); })
-      .attr("text-anchor", "middle")
-      .attr("transform", function (d) {
-        return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
-      })
-      .text(function (d) { return d.text; });
-  }
+  var cloudDrawn = false;
 
   function displayCloud() {
     d3.selectAll('#radar').style('display', 'none')
     d3.selectAll('#tagcloud').style('display', 'block')
-    cloudLayout.start();
+    if (!cloudDrawn) {
+      var cloudFill = d3.scaleOrdinal(d3.schemeCategory10);
+
+      function cloudDraw(words) {
+        d3.select("#tagcloud").append("svg")
+          .attr("width", cloudLayout.size()[0])
+          .attr("height", cloudLayout.size()[1])
+          .append("g")
+          .attr("transform", "translate(" + cloudLayout.size()[0] / 2 + "," + cloudLayout.size()[1] / 2 + ")")
+          .selectAll("text")
+          .data(words)
+          .enter().append("text")
+          .style("font-size", function (d) { return d.size + "px"; })
+          .style("font-family", "Impact")
+          .style("fill", function (d, i) { return cloudFill(i); })
+          .attr("text-anchor", "middle")
+          .attr("transform", function (d) {
+            return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+          })
+          .text(function (d) { return d.text; });
+      }
+
+      var maxRefCount = Object.keys(radar.tags()).reduce(function (currMax, tag) {
+        return Math.max(currMax, radar.tags()[tag].length)
+      }, 0)
+
+      var cloudLayout = d3cloud()
+        .size([d3.select("#tagcloud").node().clientWidth, 500])
+        .words(Object.keys(radar.tags())
+          .map(function (d) {
+            return { text: d, size: 10 + radar.tags()[d].length/maxRefCount * 90, test: "haha" };
+          })
+        )
+        .padding(5)
+        .rotate(function () { return ~~(Math.random() * 2) * 90; })
+        .font("Impact")
+        .fontSize(function (d) { return d.size; })
+        .on("end", cloudDraw);
+
+      cloudLayout.start();
+      cloudDrawn = true;
+    }
   }
 
   function selectQuadrant(order, startAngle) {
