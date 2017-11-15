@@ -435,22 +435,18 @@ const Radar = function (size, radar) {
         selected.attr('style', '')
 
       } else {
-        var hideSet = selected
 
-        tags.forEach(function(tag) {
-          const selector = '[data-tags~=' + tag + ']'
+        const selectors = tags.map(function(tag) { return '[data-tags~=' + tag + ']' }).join(', ');
+        const negateSelectors = ':not('+selectors+')';
 
-          // show
-          selected
-            .filter(selector)
-            .attr('style', '')
+        //show
+        selected
+          .filter(selectors)
+          .attr('style', '')
 
-          // hide
-          hideSet = hideSet
-            .filter(':not('+ selector +')')
-        })
-
-        hideSet.attr('style', 'display:none')
+        selected
+          .filter(negateSelectors)
+          .attr('style', 'display:none')
       }
     }
   }
