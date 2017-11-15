@@ -8,7 +8,7 @@ const _ = {
 };
 
 const Radar = function() {
-  var self, quadrants, blipNumber, addingQuadrant;
+  var self, quadrants, tags, blipNumber, addingQuadrant;
 
   blipNumber = 0;
   addingQuadrant = 0;
@@ -60,6 +60,14 @@ const Radar = function() {
 
   self.quadrants = function () {
     return quadrants;
+  };
+
+  self.setTags = function (newTags) {
+    tags = newTags
+  };
+
+  self.tags = function () {
+    return tags;
   };
 
   return self;

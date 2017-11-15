@@ -561,10 +561,9 @@ const Radar = function (size, radar) {
     rings = radar.rings();
     quadrants = radar.quadrants();
     var header = plotRadarHeader();
+    var tags = Object.keys(radar.tags());
 
     plotQuadrantButtons(quadrants, header);
-
-    const tags = ['', 'test', 'ci', 'style'];
     plotFilter(tags, header);
 
     radarElement.style('height', size + 14 + 'px');
