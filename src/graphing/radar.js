@@ -6,7 +6,7 @@ const _ = require('lodash/core');
 const RingCalculator = require('../util/ringCalculator');
 
 const Radar = function (size, radar) {
-  var svg, radarElement, blipWidth = 22;
+  var svg, radarElement, cloudElement, blipWidth = 22;
 
   var tip = d3tip().attr('class', 'd3-tip').html(function (text) {
     return text;
@@ -351,6 +351,9 @@ const Radar = function (size, radar) {
     removeHomeLink();
     removeRadarLegend();
 
+    d3.selectAll('#radar').style('display', 'block')
+    d3.selectAll('#tagcloud').style('display', 'none')
+
     svg.style('left', 0).style('right', 0);
 
     d3.selectAll('.button')
@@ -413,6 +416,10 @@ const Radar = function (size, radar) {
       addButton(quadrants[i]);
     });
 
+    header.append('div')
+      .attr('class', 'button cloud full-view')
+      .text('Tag Cloud')
+      .on('click', displayCloud);
 
     header.append('div')
       .classed('print-radar button no-capitalize', true)
@@ -485,7 +492,15 @@ const Radar = function (size, radar) {
     d3.selectAll('.quadrant-group:not(.quadrant-group-' + order + ')').style('opacity', 1);
   }
 
+  function displayCloud() {
+    d3.selectAll('#radar').style('display', 'none')
+    d3.selectAll('#tagcloud').style('display', 'block')
+  }
+
   function selectQuadrant(order, startAngle) {
+    d3.selectAll('#radar').style('display', 'block')
+    d3.selectAll('#tagcloud').style('display', 'none')
+
     d3.selectAll('.home-link').classed('selected', false);
     createHomeLink(d3.select('header'));
 
@@ -544,6 +559,7 @@ const Radar = function (size, radar) {
 
   self.init = function () {
     radarElement = d3.select('body').append('div').attr('id', 'radar');
+    cloudElement = d3.select('body').append('div').attr('id', 'tagcloud').append('span').text("I'm a cloud. Adore me!");
     return self;
   };
 

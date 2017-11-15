@@ -150,6 +150,12 @@ body {
 
 
 @media screen {
+  #tagcloud {
+    width: 80%;
+    margin: 0 auto;
+    position: relative;
+    display: none;
+  }
 
   #radar {
     width: 80%;
