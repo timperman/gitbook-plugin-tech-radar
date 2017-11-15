@@ -67,3 +67,16 @@
     }
   }
 }
+
+.radar-filter-container {
+  width: 90%;
+  margin:0 auto;
+  line-height: 1.2em;
+}
+
+@media (min-width: 60rem) {
+  .radar-filter-container {
+    width: 25%;
+    margin: 0 25% 0 50%;
+  }
+}
