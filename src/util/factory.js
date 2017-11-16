@@ -96,7 +96,7 @@ const JsonToRadar = function (name) {
                     radar.addQuadrant(quadrant)
                 });
 
-		radar.setTags(tags);
+			radar.setTags(tags);
 
                 var size = (window.innerHeight - 133) < 620 ? 620 : window.innerHeight - 133;
 

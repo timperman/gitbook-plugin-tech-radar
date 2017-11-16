@@ -13,12 +13,12 @@ let plugins = [
     new ExtractTextPlugin('[name].[hash].css'),
     new webpack.NoErrorsPlugin(),
     new webpack.optimize.DedupePlugin(),
-    new webpack.optimize.UglifyJsPlugin({
-        compress: {
-            warnings: false
-        },
-        mangle: true
-    }),
+    // new webpack.optimize.UglifyJsPlugin({
+    //     compress: {
+    //         warnings: false
+    //     },
+    //     mangle: true
+    // }),
     new webpack.optimize.OccurenceOrderPlugin()
 ];
 

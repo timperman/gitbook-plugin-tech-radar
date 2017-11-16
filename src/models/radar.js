@@ -18,6 +18,7 @@ const Radar = function() {
     {order: 'third', startAngle: -90},
     {order: 'fourth', startAngle: -180}
   ];
+  quadrantBlips = {};
   self = {};
 
   function setNumbers(blips) {
@@ -32,6 +33,7 @@ const Radar = function() {
     }
     quadrants[addingQuadrant].quadrant = quadrant;
     setNumbers(quadrant.blips());
+    quadrantBlips[quadrant.name()] = quadrant.blips();
     addingQuadrant++;
   };
 
@@ -61,6 +63,12 @@ const Radar = function() {
   self.quadrants = function () {
     return quadrants;
   };
+
+  self.quadrantBlips = function () {
+    return quadrantBlips;
+  }
+
+  self.allBlips = allBlips
 
   self.setTags = function (newTags) {
     tags = newTags
