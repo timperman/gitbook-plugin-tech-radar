@@ -507,7 +507,8 @@ const Radar = function (size, radar) {
       .append('label')
 	.attr('class', 'radar-filter-option-label')
 	.attr('for', 'radar-filter-option')
-	.text('+/-')
+  .attr('title', 'if checked, only things that have all the tags will be shown (and), if unchecked, all things that have at least one tag will be shown')
+	.text('intersect')
 
     radarFilterContainer
       .append('div')
