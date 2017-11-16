@@ -1373,23 +1373,23 @@ form.no-padding {
     padding: 0
 }
 
-input,
-select,
-textarea {
-    display: inline-block;
-    height: 2.4em;
-    padding: 5px 15px;
-    margin-bottom: 5px;
-    font-size: 16px;
-    width: 100%;
-    background-color: #ebebeb;
-    color: #666;
-    border-width: 0;
-    box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    border-radius: 0;
-    border-bottom: 2px solid #d7d7d7
-}
+// input,
+// select,
+// textarea {
+//     display: inline-block;
+//     height: 2.4em;
+//     padding: 5px 15px;
+//     margin-bottom: 5px;
+//     font-size: 16px;
+//     width: 100%;
+//     background-color: #ebebeb;
+//     color: #666;
+//     border-width: 0;
+//     box-sizing: border-box;
+//     -moz-box-sizing: border-box;
+//     border-radius: 0;
+//     border-bottom: 2px solid #d7d7d7
+// }
 
 label.location-label {
     float: left;
@@ -1472,7 +1472,6 @@ textarea:focus {
 }
 
 label {
-    display: block;
     margin-bottom: .2em
 }
 

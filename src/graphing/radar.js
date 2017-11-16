@@ -429,8 +429,14 @@ const Radar = function (size, radar) {
       .on('click', window.print.bind(window));
   }
 
+  function changeFilter() {
+    self.filter = d3.event.target.checked
+    filterTags()
+  }
+
   function filterTags() {
-    const tags = Array.from(d3.event.target.options)
+    // const tags = Array.from(d3.event.target.options)
+    const tags = Array.from(d3.select('.radar-filter-select').node().options)
       .reduce(function(acc, tag) {
         tag.selected && acc.push(tag.value);
         return acc;
@@ -445,36 +451,79 @@ const Radar = function (size, radar) {
 
       } else {
 
-        const selectors = tags.map(function(tag) { return '[data-tags~=' + tag + ']' }).join(', ');
-        const negateSelectors = ':not('+selectors+')';
+	var hideSet = selected
+	var showSet = selected
 
-        //show
-        selected
-          .filter(selectors)
-          .attr('style', '')
+	if(self.filter) {
+	  tags.forEach(function(tag) {
+	    const selector = '[data-tags~=' + tag + ']'
 
-        selected
-          .filter(negateSelectors)
-          .attr('style', 'display:none')
+	    // show
+	    showSet = showSet
+	      .filter(selector)
+	      .attr('style', '')
+	  })
+
+	  selected.attr('style', 'display:none')
+	  showSet.attr('style', '')
+
+
+	} else {
+	  tags.forEach(function(tag) {
+	    const selector = '[data-tags~=' + tag + ']'
+
+	    // show
+	    selected
+	      .filter(selector)
+	      .attr('style', '')
+
+	    // hide
+	    hideSet = hideSet
+	      .filter(':not('+ selector +')')
+	  })
+
+	  hideSet.attr('style', 'display:none')
+	}
+
       }
     }
   }
 
   function plotFilter(data, selectedElement) {
-    selectedElement.append('div')
-      .attr('class', 'radar-filter-container')
-      .append('select')
-	.attr('class', 'radar-filter')
-	.attr('multiple', 'true')
-	.on('change', filterTags)
-	.selectAll('option')
-	  .data(data).enter()
-	    .append('option')
-	    .attr('value', function(d) { return d; })
-	    .text(function(d) { return d; })
+    const radarFilterContainer = selectedElement.append('div')
+      .attr('class', 'radar-filter-container');
+
+    radarFilterContainer
+      .append('input')
+	.attr('type', 'checkbox')
+	.attr('value', 'filter')
+	.on('change', changeFilter)
+	.attr('class', 'radar-filter-option')
+	.attr('name', 'radar-filter-option')
+	.attr('id', 'radar-filter-option')
+
+
+    radarFilterContainer
+      .append('label')
+	.attr('class', 'radar-filter-option-label')
+	.attr('for', 'radar-filter-option')
+	.text('+/-')
+
+    radarFilterContainer
+      .append('div')
+      .attr('class', 'radar-filter')
+	.append('select')
+	  .attr('class', 'radar-filter-select')
+	  .attr('multiple', 'true')
+	  .on('change', filterTags)
+	  .selectAll('option')
+	    .data(data).enter()
+	      .append('option')
+	      .attr('value', function(d) { return d; })
+	      .text(function(d) { return d; })
 
     return new SlimSelect({
-      select: '.radar-filter',
+      select: '.radar-filter-select',
       placeholder: 'tags'
     })
   }
@@ -642,7 +691,8 @@ const Radar = function (size, radar) {
   };
 
   self.state = {
-    tags: radar.tags
+    tags: radar.tags,
+    filter: false
   }
 
   return self;
