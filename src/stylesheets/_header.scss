@@ -95,6 +95,10 @@ header {
         color: white;
         background-color: $violet;
       }
+      &.cloud {
+        color: white;
+        background-color: $pink;
+      }
     }
 
     &.full-view {
@@ -112,6 +116,10 @@ header {
       }
       &.fourth {
         background-color: $violet;
+        color: $white;
+      }
+      &.cloud {
+        background-color: $pink;
         color: $white;
       }
     }

@@ -390,10 +390,10 @@ const Radar = function (size, radar) {
       .style('cursor', 'pointer')
       .on('click', redrawFullRadar);
 
-    header.select('.radar-title')
-      .append('div')
-      .attr('class', 'radar-title__logo')
-      .html('<a href="https://www.thoughtworks.com"> <img src="/images/logo.png" /> </a>');
+    // header.select('.radar-title')
+    //   .append('div')
+    //   .attr('class', 'radar-title__logo')
+    //   .html('<a href="https://www.thoughtworks.com"> <img src="/images/logo.png" /> </a>');
 
     return header;
   }
@@ -554,8 +554,11 @@ const Radar = function (size, radar) {
   var cloudDrawn = false;
 
   function displayCloud() {
+    createHomeLink(d3.select('header'));
     d3.selectAll('#radar').style('display', 'none')
     d3.selectAll('#tagcloud').style('display', 'block')
+    d3.selectAll('.button').classed('selected', false).classed('full-view', false);
+    d3.selectAll('.button.cloud').classed('selected', true);
     if (!cloudDrawn) {
       var cloudFill = d3.scaleOrdinal(d3.schemeCategory10);
 
@@ -688,7 +691,7 @@ const Radar = function (size, radar) {
       plotBlips(quadrantGroup, rings, quadrant);
     });
 
-    plotRadarFooter();
+    // plotRadarFooter();
   };
 
   self.state = {
