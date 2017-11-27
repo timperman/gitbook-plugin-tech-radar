@@ -33,8 +33,10 @@ tech-radar:
   ring: trial
   topic: Topic #Optional - will be appended to the name in the radar blip summary
   # Optional metadata hash - the keys and value will be listed in the radar blip summary
+  tags:
+  - one
+  - two
   metadata:
-    Tags: my tag, your tag
     MyKey: my value
 ---
 
