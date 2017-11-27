@@ -1,7 +1,7 @@
 const webpack = require('webpack')
 var webpackBuild = require('./webpack.config.js')
 
-var descRegExp = new RegExp(/<p>(.+?)<\/p>/)
+var descRegExp = new RegExp(/<p>((?:.|\n)+?)<\/p>/)
 
 let radar = {
   blips: [],
@@ -25,9 +25,11 @@ module.exports = {
         if ( page['tech-radar'] ) {
           var result = descRegExp.exec(page.content)
           const blip = {
-            name: page.title,
-            description: (result != null && result.length > 0) ? result[0] : '',
+            name: page['tech-radar'].name || page.title,
+            description: ( result != null && result.length > 0 ) ? result[1] : '',
             ring: page['tech-radar'].ring,
+            metadata: page['tech-radar'].metadata && JSON.stringify(page['tech-radar'].metadata),
+            topic: page['tech-radar'].topic,
             quadrant: page['tech-radar'].quadrant,
             docLink: this.output.toURL(page.path),
             isNew: isBlipNew(page),
@@ -54,6 +56,8 @@ module.exports = {
         var config = this.config.get('pluginsConfig.tech-radar', {});
         radar.name = config.title
         radar.rings = config.rings
+        radar.footerHtml = config.footerHtml
+        radar.headerImageHtml = config.headerImageHtml
 
         var bookDir = this.output.resolve(".")
 

@@ -54,6 +54,8 @@ const JsonToRadar = function (name) {
             try {
 
                 name = RadarData.name;
+                var footerHtml = RadarData.footerHtml;
+                var headerImageHtml = RadarData.headerImageHtml;
 
                 var all = RadarData.blips;
                 var tags = RadarData.tags;
@@ -88,13 +90,19 @@ const JsonToRadar = function (name) {
                     if (!quadrants[blip.quadrant]) {
                         quadrants[blip.quadrant] = new Quadrant(_.capitalize(blip.quadrant));
                     }
-                    quadrants[blip.quadrant].add(new Blip(blip.name, ringMap[blip.ring], blip.isNew.toLowerCase() === 'true', blip.topic, blip.description, blip.docLink, blip.tags))
+                    quadrants[blip.quadrant].add(new Blip(blip.name, ringMap[blip.ring], blip.isNew.toLowerCase() === 'true', blip.topic, blip.description, blip.docLink, blip.tags, blip.metadata))
                 });
 
                 var radar = new Radar();
                 _.each(quadrants, function (quadrant) {
                     radar.addQuadrant(quadrant)
                 });
+                if (footerHtml) {
+                  radar.addFooterHtml(footerHtml)
+                }
+                if (headerImageHtml) {
+                  radar.addHeaderImageHtml(headerImageHtml);
+                }
 
 			radar.setTags(tags);
 

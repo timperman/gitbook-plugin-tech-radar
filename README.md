@@ -31,10 +31,33 @@ tech-radar:
   name: Vault
   quadrant: Tools
   ring: trial
+  topic: Topic #Optional - will be appended to the name in the radar blip summary
+  # Optional metadata hash - the keys and value will be listed in the radar blip summary
+  tags:
+  - one
+  - two
+  metadata:
+    MyKey: my value
 ---
 
 # Vault Secret Storage
+
+Vault is super secret.
+
+You should use it.
 ```
+
+The quadrant and ring will be used to decide where to place the blip. The name, metadata, and the first paragraph in
+the page will be used for the exandable summary area in the radar. The example above will look like:
+
+-------------------
+### Vault
+**Tags**: my tag, your tag  
+**MyKey**: my value
+
+Vault is super secret
+
+-------------------
 
 **NOTE:** There will be an error message on the generated radar if there are less than four quadrants represented in the pages' markdown files.
 
@@ -54,3 +77,18 @@ Specify an `{ "name": "index", ... }` format map of rings like so:
 ```
 
 The ring names in page front matter must match ring names in the plugin config.
+
+### Customize the radar header and footer content
+
+You can add your own headerImageHtml and footerHtml to override ThoughtWorks defaults
+```javascript
+{
+    "plugins": ["tech-radar"],
+    "pluginsConfig": {
+        "tech-radar": {
+            "footerHtml": "This is our radar. It is based on the <a href=\"https://www.thoughtworks.com/insights/blog/build-your-own-technology-radar\">enterprise tech radar article</a> by ThoughtWorks.",
+            "headerImageHtml": "<img src=\"https://example.com/logo.png\" />"
+        }
+    }
+}
+```

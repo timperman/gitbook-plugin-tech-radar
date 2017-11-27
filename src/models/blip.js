@@ -1,4 +1,4 @@
-const Blip = function (name, ring, isNew, topic, description, docLink, tags) {
+const Blip = function (name, ring, isNew, topic, description, docLink, tags, metadata) {
   var self, number;
 
   self = {};
@@ -11,6 +11,14 @@ const Blip = function (name, ring, isNew, topic, description, docLink, tags) {
   self.topic = function () {
     return topic || '';
   };
+
+  self.metadata = function () {
+    if (metadata) {
+      return JSON.parse(metadata);
+    } else {
+      return {};
+    }
+  }
 
   self.description = function () {
     return description || '';
