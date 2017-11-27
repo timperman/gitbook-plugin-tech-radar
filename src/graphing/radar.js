@@ -150,10 +150,10 @@ const Radar = function (size, radar) {
     return [x, y]
   }
 
-  function thereIsCollision (coordinates, allCoordinates) {
+  function thereIsCollision(coordinates, allCoordinates, overlapMultiplier) {
     return allCoordinates.some(function (currentCoordinates) {
-      return (Math.abs(currentCoordinates[0] - coordinates[0]) < blipWidth) && (Math.abs(currentCoordinates[1] - coordinates[1]) < blipWidth)
-    })
+      return (Math.abs(currentCoordinates[0] - coordinates[0]) < blipWidth * overlapMultiplier) && (Math.abs(currentCoordinates[1] - coordinates[1]) < blipWidth * overlapMultiplier)
+    });
   }
 
   function plotBlips (quadrantGroup, rings, quadrantWrapper) {
@@ -187,23 +187,31 @@ const Radar = function (size, radar) {
       }, 0)
       var chance = new Chance(Math.PI * sumRing * ring.name().length * sumQuadrant * quadrant.name().length)
 
-      var ringList = addRing(ring.name(), order)
-      var allBlipCoordinatesInRing = []
+      var ringList = addRing(ring.name(), order);
+      var allBlipCoordinatesInRing = [];
+      var overlapMultiplier = 1;
+      if (ringBlips.length > 20) {
+        overlapMultiplier = 0.48;
+      } else if (ringBlips.length > 10) {
+        overlapMultiplier = 0.75;
+      }
 
       ringBlips.forEach(function (blip) {
 	var coordinates = calculateBlipCoordinates(chance, minRadius, maxRadius, startAngle)
 	var maxIterations = 100
 	var iterationCounter = 0
 
-        while (thereIsCollision(coordinates, allBlipCoordinatesInRing) && (iterationCounter < maxIterations)) {
-	  coordinates = calculateBlipCoordinates(chance, minRadius, maxRadius, startAngle)
-	  iterationCounter++
+        while (thereIsCollision(coordinates, allBlipCoordinatesInRing, overlapMultiplier) && (iterationCounter < maxIterations)) {
+          coordinates = calculateBlipCoordinates(chance, minRadius, maxRadius, startAngle);
+          iterationCounter++;
         }
 
-        if (iterationCounter < maxIterations) {
-	  allBlipCoordinatesInRing.push(coordinates)
-	  var x = coordinates[0]
-	  var y = coordinates[1]
+        if (iterationCounter >= maxIterations) {
+          console.log("uh-oh - we were unable to find a conflict-free place to put your blip: " + blip.name());
+        } else {
+          allBlipCoordinatesInRing.push(coordinates);
+          var x = coordinates[0];
+          var y = coordinates[1];
 
           var group = quadrantGroup.append('g')
             .attr('class', 'blip-link')
@@ -232,11 +240,24 @@ const Radar = function (size, radar) {
 	    .text(blipText)
 
           var blipItemDescription = blipListItem.append('div')
-	    .attr('class', 'blip-item-description')
-	  if (blip.description() || blip.docLink()) {
-	    var desc = blip.docLink() ? '<a href="' + blip.docLink() + '">Documentation</a><br/><br/>' : ''
-	    blipItemDescription.append('p').html(desc + blip.description() + 'Tags: ' + blip.tags().join(', '))
-	  }
+      .attr('class', 'blip-item-description');
+    if (blip.description() || blip.docLink()) {
+      var desc = '';
+      var metadata = blip.metadata();
+      for (var key in metadata) {
+        if (metadata.hasOwnProperty(key)) {
+          desc = desc + '<strong>' + key + '</strong>: ' + metadata[key] + '<br/>';
+        }
+      }
+      if (blip.tags()) {
+        desc = desc + 'Tags: ' + blip.tags().join(', ') + '<br/>';
+      }
+
+      if (blip.docLink()) {
+        desc = desc + '<a href="' + blip.docLink() + '">Further Reading</a><br/><br/>';
+      }
+      blipItemDescription.append('p').html(desc + blip.description());
+    }
 
           var mouseOver = function () {
 	    d3.selectAll('g.blip-link').attr('opacity', 0.3)
@@ -378,8 +399,10 @@ const Radar = function (size, radar) {
       .style('pointer-events', 'auto')
   }
 
-  function plotRadarHeader () {
-    var header = d3.select('body').insert('header', '#radar')
+  function plotRadarHeader(headerImageHtml) {
+    headerImageHtml = headerImageHtml || '<a href="https://www.thoughtworks.com"> <img src="/images/logo.png" /> </a>'
+
+    var header = d3.select('body').insert('header', "#radar");
     header.append('div')
       .attr('class', 'radar-title')
       .append('div')
@@ -389,10 +412,10 @@ const Radar = function (size, radar) {
       .style('cursor', 'pointer')
       .on('click', redrawFullRadar)
 
-    // header.select('.radar-title')
-    //   .append('div')
-    //   .attr('class', 'radar-title__logo')
-    //   .html('<a href="https://www.thoughtworks.com"> <img src="/images/logo.png" /> </a>');
+    header.select('.radar-title')
+      .append('div')
+      .attr('class', 'radar-title__logo')
+      .html(headerImageHtml);
 
     return header
   }
@@ -520,17 +543,18 @@ const Radar = function (size, radar) {
     })
   }
 
-  function plotRadarFooter () {
+  function plotRadarFooter(footerHtml) {
+    footerHtml = footerHtml || 'Powered by <a href="https://www.thoughtworks.com"> ThoughtWorks</a>. '
+      + 'By using this service you agree to <a href="https://info.thoughtworks.com/visualize-your-tech-strategy-terms-of-service.html">ThoughtWorks\' terms of use</a>. '
+      + 'You also agree to our <a href="https://www.thoughtworks.com/privacy-policy">privacy policy</a>, which describes how we will gather, use and protect any personal data contained in your public Google Sheet. '
+      + 'This software is <a href="https://github.com/thoughtworks/build-your-own-radar">open source</a> and available for download and self-hosting.';
     d3.select('body')
       .insert('div', '#radar-plot + *')
       .attr('id', 'footer')
       .append('div')
       .attr('class', 'footer-content')
       .append('p')
-      .html('Powered by <a href="https://www.thoughtworks.com"> ThoughtWorks</a>. '
-      + 'By using this service you agree to <a href="https://info.thoughtworks.com/visualize-your-tech-strategy-terms-of-service.html">ThoughtWorks\' terms of use</a>. '
-      + 'You also agree to our <a href="https://www.thoughtworks.com/privacy-policy">privacy policy</a>, which describes how we will gather, use and protect any personal data contained in your public Google Sheet. '
-      + 'This software is <a href="https://github.com/thoughtworks/build-your-own-radar">open source</a> and available for download and self-hosting.')
+      .html(footerHtml)
   }
 
   function mouseoverQuadrant (order) {
@@ -661,9 +685,9 @@ const Radar = function (size, radar) {
   self.plot = function () {
     var rings, quadrants
 
-    rings = radar.rings()
-    quadrants = radar.quadrants()
-    var header = plotRadarHeader()
+    rings = radar.rings();
+    quadrants = radar.quadrants();
+    var header = plotRadarHeader(radar.headerImageHtml());
     var tags = Object.keys(radar.tags())
 
     plotQuadrantButtons(quadrants, header)
@@ -680,7 +704,7 @@ const Radar = function (size, radar) {
       plotBlips(quadrantGroup, rings, quadrant)
     })
 
-    // plotRadarFooter();
+    plotRadarFooter(radar.footerHtml());
   }
 
   self.state = {

@@ -8,7 +8,7 @@ const _ = {
 };
 
 const Radar = function() {
-  var self, quadrants, tags, blipNumber, addingQuadrant;
+  var self, quadrants, tags, blipNumber, addingQuadrant, footerHtml, headerImageHtml;
 
   blipNumber = 0;
   addingQuadrant = 0;
@@ -77,6 +77,22 @@ const Radar = function() {
   self.tags = function () {
     return tags;
   };
+
+  self.addFooterHtml = function (data) {
+    footerHtml = data;
+  };
+
+  self.footerHtml = function () {
+    return footerHtml;
+  };
+
+  self.addHeaderImageHtml = function (data) {
+    headerImageHtml = data;
+  };
+
+  self.headerImageHtml = function () {
+    return headerImageHtml;
+  }
 
   return self;
 };
